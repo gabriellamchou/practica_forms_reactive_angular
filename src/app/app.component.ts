@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -12,6 +12,8 @@ export class AppComponent implements OnInit {
   signupForm!: FormGroup;
   forbiddenUsernames = ['Chris', 'Anna'];
 
+  constructor(private fb: FormBuilder) {}
+
   /**
    * Importante añadir el forbiddenNames.bind(this). Esto se debe a que 
    * este validador no se llamará desde esta clase y por tanto 'this' se
@@ -19,16 +21,23 @@ export class AppComponent implements OnInit {
    * esta clase
    */
   ngOnInit(): void {
-    this.signupForm = new FormGroup({
-      'userData': new FormGroup({
-        'username': new FormControl(null, [Validators.required, this.forbiddenNames.bind(this)]),
-        'email' : new FormControl(null, {
-          validators: [Validators.required, Validators.email], 
-          }) //asyncValidators: this.forbiddenEmails
+    this.signupForm = this.fb.group({
+      'userData' : this.fb.group({
+        'username' : ['', [Validators.required, this.forbiddenNames.bind(this)]],
+        'email' : ['', [Validators.required, Validators.email], this.forbiddenEmails]
       }),
-      'gender': new FormControl('male'),
-      'hobbies': new FormArray([])
+      'gender' : ['male'],
+      'hobbies' : new FormArray([])
     });
+
+    // this.signupForm = new FormGroup({
+    //   'userData': new FormGroup({
+    //     'username': new FormControl(null, [Validators.required, this.forbiddenNames.bind(this)]),
+    //     'email' : new FormControl(null, [Validators.required, Validators.email]) // asyncValidators: this.forbiddenEmails
+    //   }),
+    //   'gender': new FormControl('male'),
+    //   'hobbies': new FormArray([])
+    // });
 
     // this.signupForm.valueChanges.subscribe(
     //   (value) => console.log(value)
